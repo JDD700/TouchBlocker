@@ -25,7 +25,9 @@ jobs:
           sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
 
       - name: Build APKs (production debug + release)
-        run: ./gradlew :app:assembleProductionDebug :app:assembleProductionRelease --console=plain
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :app:assembleProductionDebug :app:assembleProductionRelease --console=plain
 
       - name: Upload APKs
         uses: actions/upload-artifact@v4
