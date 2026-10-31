@@ -1,0 +1,37 @@
+name: Build Touch Blocker APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK platform 37 and build-tools
+        run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+
+      - name: Build APKs (production debug + release)
+        run: ./gradlew :app:assembleProductionDebug :app:assembleProductionRelease --console=plain
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: TouchBlocker-apk
+          path: |
+            app/build/outputs/apk/production/debug/*.apk
+            app/build/outputs/apk/production/release/*.apk
+          if-no-files-found: error
